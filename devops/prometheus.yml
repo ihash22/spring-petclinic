@@ -1,0 +1,26 @@
+# Global Prometheus configuration
+global:
+  # How often to scrape targets for metrics (every 15 seconds)
+  scrape_interval: 15s
+  # How often to evaluate alerting rules (every 15 seconds)
+  evaluation_interval: 15s
+
+# Alerting rules configuration (none defined yet)
+rule_files:
+
+# Configuration for scraping metrics from different services
+scrape_configs:
+  # Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Monitor Jenkins for CI/CD metrics
+  - job_name: 'jenkins'
+    static_configs:
+      # Use container name as hostname within Docker network
+      - targets: ['jenkins:8080']
+    # Jenkins Prometheus plugin exposes metrics at /prometheus endpoint
+    metrics_path: '/prometheus'
+    # Scrape Jenkins more frequently (every 5 seconds) since builds change rapidly
+    scrape_interval: 5s
