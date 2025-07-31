@@ -282,7 +282,7 @@ services:
         sonarqube_logs:
         sonarqube_extensions:
     networks:
-        devops-petclinic-network: {)
+        devops-petclinic-network: {}
 ```
 
 screenshots/Screenshot 2025-07-31 at 10.13.42 AM.png
@@ -341,8 +341,6 @@ screenshots/Screenshot 2025-07-31 at 10.22.19 AM.png
 
 
 ## Prometheus Setup
-```
-```
 
 * Added Prometheus to docker-compose.yml file
 
@@ -409,8 +407,231 @@ screenshots/Screenshot 2025-07-31 at 10.28.45 AM.png
 
 * Restarted docker to make sure prometheus was visible
 
+```
+docker-compose up -d
+```
+screenshots/Screenshot 2025-07-31 at 11.09.18 AM.png
 
+* Add the prometheus dependency to the pom.xml file in the spring-petclinic repo so the app can generate metrics in the right format
+
+
+```
+<dependency>
+    <groupId>io.micrometer</groupId>
+    ‹artifactId»micrometer-registry-prometheus</artifactId>
+</dependency>
+```
+screenshots/Screenshot 2025-07-31 at 11.10.49 AM.png
+
+* Added prometheus configuration to application.properties file in spring-petclinic to expose metrics endpoints for scraping
+
+
+```
+spring-petclinic › src › main › resources › E application.properties
+
+
+
+# database init, supports mysql too
+database=h2
+spring.sql. init.schema-locations=classpath*:db/$(database}/schema.sql
+spring.sql.init.data-locations=classpath*:db/${database)/data.sql
+
+# Web
+spring.thymeleaf.mode=HTML
+
+# JPA|
+spring.jpa.hibernate.ddl-auto=none
+spring-jpa.open-in-view=false
+* Internationalization
+spring.messages.basename=messages/messages
+
+# Actuator
+management.endpoints.web.exposure.include=*
+
+# Logging
+logging. level.org.springframework=INFO
+#logging.level.org-springframework-web=DEBUG
+# logging.level.org.springframework.context.annotation=TRACE
+
+# Maximum time static resources should be cached
+spring-web. resources.cache.cachecontrol.max-age=12h
+
+# Prometheus
+management.endpoints.web.exposure.include=*
+management.endpoint.prometheus.enabled=true
+management.metrics.export.prometheus.enabled=true
+```
+
+screenshots/Screenshot 2025-07-31 at 11.13.39 AM.png
+
+* Pushed changes to repo
+
+screenshots/Screenshot 2025-07-31 at 11.16.41 AM.png
+
+* Checked Jenkins Logs to make sure pipeline ran successfully
+
+screenshots/Screenshot 2025-07-31 at 11.16.49 AM.png
+
+* Checked Prometheus Dashboard. Prometheus now tracking metrics for Spring Pet clinic
+
+screenshots/Screenshot 2025-07-31 at 11.17.06 AM.png
+
+* Added job to track metrics from Jenkins
+
+```
+prometheus > !prometheus.yml
+
+
+
+
+global:
+    scrape_interval: 15s
+
+scrape_configs:
+    - job_name: 'spring-petclinic'
+    metrics_path: '/actuator/prometheus' 
+    static_configs:
+        - targets: ['192.168.64.2:8080']
+
+- job_name: 'jenkins'
+    metrics_path: '/prometheus' 
+    static_configs:
+        - targets: I'petclinic-jenkins: 8080']
+```
+
+screenshots/Screenshot 2025-07-31 at 11.18.13 AM.png
+
+* Checked prometheus dashboard and it is now tracking back jenkins pipeline and pet-spring clinic metrics
+
+screenshots/Screenshot 2025-07-31 at 11.20.15 AM.png
 
 ## Grafana Setup
 
+* Added grafana to docker-compose.yml file
+
+```
+docker-compose.yml 
+
+
+
+
+services:
+    grafana:
+        image: grafana/grafana: latest
+        container_name: petclinic-grafana 
+        ports:
+            - "3000:3000"
+        volumes:
+            - grafana_devops_data:/var/lib/grafana 
+        networks:
+            - devops-petclinic-network
+
+volumes:
+    jenkins_devops_final:
+    sonarqube_devops_data:
+    sonarqube_devops_logs:
+    sonarqube_devops_extensions:
+    grafana_devops_data:
+
+networks:
+    devops-petclinic-network: {}
+```
+screenshots/Screenshot 2025-07-31 at 11.21.31 AM.png
+
+* Re-ran docker to make sure it got added to the devops docker container
+
+screenshots/Screenshot 2025-07-31 at 11.25.27 AM.png
+
+* UserName and Password
+
+admin/admin
+
+* Added prometheus as a data source within the grafana dashboard
+
+screenshots/Screenshot 2025-07-31 at 11.29.31 AM.png
+
+* Added basic queries to track spring-petclinic metrics
+
+screenshots/Screenshot 2025-07-31 at 11.29.46 AM.png
+
+* Added base queries to track Jenkin Build metrics.
+
+screenshots/Screenshot 2025-07-31 at 11.29.55 AM.png
+
+* Grafana is now visualizing metrics collected by Prometheus for both Jenkin Builds and the PetClinic application.
+
+screenshots/Screenshot 2025-07-31 at 11.30.04 AM.png
+
+* Made change to trigger pipeline and see if grafana dashboard captured new metrics
+
+screenshots/Screenshot 2025-07-31 at 11.30.12 AM.png
+
+* Grafana successfully capturing metrics for both petclinic app and jenkins dashboard
+
+screenshots/Screenshot 2025-07-31 at 11.30.21 AM.png
+
 ## Owasp Zap
+
+
+* Added owasp zap to the docker-compose file
+
+
+```
+docker-compose.yml
+
+
+
+
+
+services:
+
+    zap:
+        image: zaproxy/zap-stable 
+        container_name: petclinic-zap 
+        networks:
+            - devops-petclinic-network 
+        entrypoint:
+            - zap.sh
+            - -daemon
+            -host
+            0.0.0.0
+            -port
+            - "8885"
+            - -config
+            - api.addrs.addr.name=.*
+            -config
+            - api.addrs.addr.regex=true
+        ports:
+            - "8885:8885"
+        Volumes:
+            - /zap-reports:/zap/wrk
+        
+volumes:
+    jenkins_devops_final:
+    sonarqube_devops_data:
+    sonarqube_devops_logs:
+    sonarqube_devops_extensions:
+    grafana_devops data:
+
+networks:
+    devops-petclinic-network:{}
+```
+screenshots/Screenshot 2025-07-31 at 11.34.19 AM.png
+
+* Re-ran docker to make sure it got pulled successfully
+
+screenshots/Screenshot 2025-07-31 at 11.34.55 AM.png
+
+* Add build step for removing any old zap report artifact and re-adding it. This is to avoid zap report errors
+
+screenshots/Screenshot 2025-07-31 at 11.35.04 AM.png
+
+* Add the build step to run the zap container to generate the reports for the jenkins build
+
+screenshots/Screenshot 2025-07-31 at 11.35.12 AM.png
+
+* Finally added post build action to generate the new zap html report
+
+screenshots/Screenshot 2025-07-31 at 11.35.20 AM.png
+
+
