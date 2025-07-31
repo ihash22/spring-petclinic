@@ -18,6 +18,9 @@ DevSecOps 17636 Summer 2025
 * References to screenshots of steps
 ___
 
+```
+```
+
 
 ## Jenkins Base Setup
 
@@ -95,13 +98,318 @@ screenshots/Screenshot 2025-07-31 at 9.15.58 AM.png
 
 ## Installed UTM VM
 
+* Installed UTM VM for Macbook as it supports Apple Silicon (M3)
+
+screenshots/Screenshot 2025-07-31 at 9.17.32 AM.png
+
+* Created VM with Ubuntu 22.0  Server (ARM 64)
+
+screenshots/Screenshot 2025-07-31 at 9.18.48 AM.png
+
+screenshots/Screenshot 2025-07-31 at 9.19.29 AM.png
+
+screenshots/Screenshot 2025-07-31 at 9.20.11 AM.png
+
+* Started the VM
+
+screenshots/Screenshot 2025-07-31 at 9.21.10 AM.png
+
+* Enabled OpenSSH in VM
+
+```
+sudo systemctl status ssh
+```
+screenshots/Screenshot 2025-07-31 at 9.22.29 AM.png
+
+* SSH’d to Devops VM on Host Machine - Host can now securely connect to Devops VM
+
+```
+ssh devops-admin@192.168.64.2
+```
+
+screenshots/Screenshot 2025-07-31 at 9.24.54 AM.png
+
+* Jenkins Container Successfully able to communicate with with Devops VM
+```
+ping 192.168.64.2
+```
+screenshots/Screenshot 2025-07-31 at 9.26.15 AM.png
 
 
 ## Ansible Setup
 
+
+* First entered Jenkins container terminal via the following command
+```
+docker exec -u 0 -it jenkins /bin/bash
+```
+screenshots/Screenshot 2025-07-31 at 9.28.17 AM.png
+
+* Then installed ansible so that the Jenkins container could run the ansible playbook commands.
+
+```
+apt update && apt install -y iputils-ping
+```
+screenshots/Screenshot 2025-07-31 at 9.29.29 AM.png
+
+* Created SSH Keys for Jenkins so that the VM won't need to enter a password every time.
+
+```
+ssh-keygen -t rsa -b 4096 -f /var/jenkins_home/.ssh/id_rsa -N"'
+```
+screenshots/Screenshot 2025-07-31 at 9.30.47 AM.png
+
+root@c13ef980a06d:/# chmod 700 /var/jenkins_home/.ssh root@c13ef980a06d:/# touch /var/jenkins_home/.ssh/known_hosts root@c13ef980a06d:/# chmod 644 /var/jenkins_home/.ssh/known_hosts root@c13ef980a06d:/# chown -R jenkins:jenkins /var/jenkins_home/.ssh
+
+```
+chmod 700 /var/jenkins_home/.ssh root@c13ef980a06d:/# touch /var/jenkins_home/.ssh/known_hosts 
+chmod 644 /var/jenkins_home/.ssh/known_hosts 
+chown -R jenkins:jenkins /var/jenkins_home/.ssh
+```
+screenshots/Screenshot 2025-07-31 at 9.31.54 AM.png
+
+* Checked to make sure the key was generated via the following command
+
+```
+cat /var/jenkins_home/.ssh/i d_rsa.pub
+```
+screenshots/Screenshot 2025-07-31 at 9.40.39 AM.png
+
+* Then I SSH’d into the devops VM environment
+```
+ssh devops-admin@192.168.64.2
+```
+screenshots/Screenshot 2025-07-31 at 9.41.53 AM.png
+
+* Then added the public key and set the file permissions to the Devops VM
+
+
+```
+mkdir -p ~/.ssh
+chmod 700 ~/ .ssh
+nano ~/.ssh/authorized_keys devops-admin@devops-vm:~$ chmod 600 ~/.ssh/authorized_keys
+```
+screenshots/Screenshot 2025-07-31 at 9.43.16 AM.png
+
+* Jenkins can now SSH into VM without needed to enter a password
+
+```
+docker exec -it jenkins ssh devops-admin@192.168.64.2
+```
+screenshots/Screenshot 2025-07-31 at 9.44.51 AM.png
+
+* Created an Ansible directory within the Spring-Petclinic directory and created a deploy.yml and inventory file
+
+screenshots/Screenshot 2025-07-31 at 10.04.07 AM.png
+
+* Inventory file
+
+screenshots/Screenshot 2025-07-31 at 10.04.26 AM.png
+
+* deploy.yml
+
+screenshots/Screenshot 2025-07-31 at 10.04.35 AM.png
+
+* Committed these and pushed to main and checked to see if Jenkins was able to capture the new changes
+
+screenshots/Screenshot 2025-07-31 at 10.05.29 AM.png
+
+* In the Jenkins container I ran the ansible playbook. Jenkins can now remotely control the Devops VM
+
+```
+/var/jenkins_home/workspace/dev ops-petclinic-pipeline/ansible# ansible-playbook
+-i inventory deploy- yml
+```
+screenshots/Screenshot 2025-07-31 at 10.06.33 AM.png
+
+* Added ansible as part of the build step of the pipeline
+
+screenshots/Screenshot 2025-07-31 at 10.07.48 AM.png
+
+* Then made a simple change to test if ansible ran on Jenkins
+
+screenshots/Screenshot 2025-07-31 at 10.08.28 AM.png
+
+* I checked the Jenkins Logs to make sure it ran successfully. It did.
+
+screenshots/Screenshot 2025-07-31 at 10.09.38 AM.png
+
+* Now to check to make sure that code is deployed correctly, I changed the homepage picture again and made sure it ran on the Devops Server’s Address. The image was successfully changed and reflected via the Devops Server Address.
+
+```
+http://192.168.64.2:8080/
+```
+
+screenshots/Screenshot 2025-07-31 at 10.10.58 AM.png
+
+
 ## SonarQube Setup
 
+* Added SonarQube to the docker-compose.yml file and created a shared network called devops-petclinic-network so that the two containers can communicate.
+
+```
+docker-compose.yml
+
+
+services:
+    jenkins:
+        image: jenkins/jenkins:lts
+        container_name: jenkins 
+        ports:
+            - "8090:8080"
+            - "50000:50000"
+        volumes:
+            - jenkins_devops_final:/var/jenkins_home
+        networks:
+        - devops-petclinic-network
+
+    sonarqube:
+        image: sonarqube: latest
+        container_name: sonarqube 
+        ports:
+            - "9000:9000"
+        networks:
+            - devops-petclinic-network 
+        environment:
+            - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true 
+        volumes:
+            - sonarqube_data:/opt/sonarqube/data
+            - sonarqube_logs:/opt/sonarqube/logs
+            - sonarqube_extensions:/opt/sonarqube/extensions
+    volumes:
+        jenkins_devops_final:
+        sonarqube_data:
+        sonarqube_logs:
+        sonarqube_extensions:
+    networks:
+        devops-petclinic-network: {)
+```
+
+screenshots/Screenshot 2025-07-31 at 10.13.42 AM.png
+
+* Re-ran docker-compose to make sure it was visible in the docker container
+
+screenshots/Screenshot 2025-07-31 at 10.17.20 AM.png
+
+* Created Auth Token for Jenkins
+
+screenshots/Screenshot 2025-07-31 at 10.17.40 AM.png
+
+* Sonarqube login password 
+
+```
+<AskForPassword>
+```
+
+Sonarqube-auth-token
+
+```
+<AskForAuthenticationToken>
+```
+
+* Added sonarqube-auth-token credentials to Jenkins
+
+screenshots/Screenshot 2025-07-31 at 10.19.40 AM.png
+
+* Installed the SonarQube Scanner Plugin
+
+screenshots/Screenshot 2025-07-31 at 10.20.03 AM.png
+
+* Added SonarQube configurations on Jenkins
+
+screenshots/Screenshot 2025-07-31 at 10.20.23 AM.png
+
+* Added SonarQube Scanner tool to the Jenkins Global Tools
+
+screenshots/Screenshot 2025-07-31 at 10.20.38 AM.png
+
+* Add SonarQube Scanner as part of build step on Jenkins
+
+screenshots/Screenshot 2025-07-31 at 10.21.00 AM.png
+
+* Made a quick change to the spring pet clinic to trigger the jenkins pipeline and see if sonarqube ran successfully.
+
+screenshots/Screenshot 2025-07-31 at 10.21.21 AM.png
+
+* Checked the SonarQube Dashboard to make sure it passed
+
+screenshots/Screenshot 2025-07-31 at 10.21.42 AM.png
+
+* Finally, checked the Logs and SonarQube ran successfully and is now fully integrated into the Jenkins pipeline
+
+screenshots/Screenshot 2025-07-31 at 10.22.19 AM.png
+
+
 ## Prometheus Setup
+```
+```
+
+* Added Prometheus to docker-compose.yml file
+
+```
+docker-compose.yml 
+
+
+services: 
+    jenkins:
+        image: jenkins/jenkins:lts 
+        container_name: petclinic-jenkins
+        ports:
+            - "8090:8080"
+            - "50000:50000"
+        volumes:
+            - jenkins_devops_final:/var/jenkins_home
+
+        networks:
+            - devops-petclinic-network
+
+    sonarqube: 
+        image: sonarqube: latest
+        container_name: petclinic-sonarqube 
+        ports:
+            - "9000:9000"
+        networks:
+            - devops-petclinic-network environment:
+            - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true 
+        volumes:
+            - sonarqube_devops_data:/opt/sonarqube/data
+            - sonarqube_devops_logs:/opt/sonarqube/logs
+            - sonarqube_devops_extensions:/opt/sonarqube/extensions
+
+    prometheus:
+        image: prom/prometheus: latest 
+        container_name: petclinic-prometheus 
+        ports:
+            - "9090:9090"
+        volumes:
+        - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+        networks:
+            - devops-petclinic-network
+```
+screenshots/Screenshot 2025-07-31 at 10.24.46 AM.png
+
+* Created a prometheus.yml file with configurations
+
+```
+prometheus › ! prometheus.yml
+
+
+
+global:
+    scrape_interval: 15s
+
+scrape_configs:
+    - job_name: 'spring-petclinic'
+        metrics_path: '/actuator/prometheus' 
+        static_configs:
+                - targets: ['192.168.64.2:8080']
+```
+
+screenshots/Screenshot 2025-07-31 at 10.28.45 AM.png
+
+* Restarted docker to make sure prometheus was visible
+
+
 
 ## Grafana Setup
 
