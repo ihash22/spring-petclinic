@@ -1,11 +1,214 @@
 # DevSecOps Final Project 
 # DevSecOps Pipeline for the Spring-Petclinic Project
 
-Ian Hash
-ihash
 DevSecOps 17636 Summer 2025
 
-## Text Dump Containing The Following
+Team Members:
+
+Ching-Yen Ho - chingyen@andrew.cmu.edu
+
+Ian Hash - ihash@andrew.cmu.edu
+
+Kavi Sarna - ksarna@andrew.cmu.edu
+
+Marco Bragado - mbragado@andrew.cmu.edu
+
+Swastik Samaddar Chowdhury - ssamadda@andrew.cmu.edu
+
+## Project Overview
+
+This project implements a complete DevSecOps pipeline using Docker containers for all services, with Jenkins as the CI/CD orchestrator. The pipeline integrates security scanning, code quality analysis, monitoring, and automated deployment to a production environment.
+
+## Architecture
+
+The project consists of the following components:
+
+### Core Services
+- **Jenkins**: CI/CD pipeline orchestration and automation
+- **SonarQube**: Static code analysis and quality gates
+- **OWASP ZAP**: Dynamic security scanning and vulnerability assessment
+- **Prometheus**: Metrics collection and monitoring
+- **Grafana**: Visualization and dashboards
+- **Production VM**: Target deployment environment
+
+## Team Structure & Responsibilities
+
+### Individual Work Phase
+
+| Team Member | Role | Deadline | Dependencies |
+|-------------|------|----------|-------------|
+| **Person A (Marco)** | Docker Infrastructure & Core Setup | July 18 | None |
+| **Person B (Swastik/Ian)** | Repository & Jenkins Pipeline | July 19 | Person A |
+| **Person C (Swastik/Ian)** | Security Analysis, VM & Grafana Setup | July 19 | Person A |
+| **Person D (Cynthia)** | Monitoring & Visualization | July 22 | Person A, C |
+| **Person E (Kavi)** | Deployment & Integration | July 26 | Person B, C, D |
+
+### Documentation Phase
+- **Infrastructure & Security Documentation**: Person A + C (July 27)
+- **Pipeline & Monitoring Documentation**: Person B + D (July 27)
+- **Integration Documentation**: Person E (July 27)
+
+### Final Phase
+- **Demo Video**: All team members (July 27)
+- **Bonus Automation**: Person A + E (July 28)
+- **Final Review & Submission**: All team members (July 29)
+
+## Key Features
+
+### 🔧 Infrastructure
+- Containerized microservices architecture
+- Custom Docker network for service isolation
+- Persistent volume management for data retention
+- Environment-specific configurations
+
+### 🚀 CI/CD Pipeline
+- Automated builds triggered by SCM polling
+- Multi-stage pipeline with quality gates
+- Blue Ocean visualization
+- Automated testing and deployment
+
+### 🔐 Security Integration
+- Static Application Security Testing (SAST) with SonarQube
+- Dynamic Application Security Testing (DAST) with OWASP ZAP
+- Automated security report generation
+- Security-first deployment practices
+
+### 📊 Monitoring & Observability
+- Real-time metrics collection with Prometheus
+- Custom Grafana dashboards
+- Jenkins performance monitoring
+- Infrastructure health tracking
+
+### 🎯 Deployment Strategy
+- Ansible-based configuration management
+- VM-based production environment
+- Automated application deployment
+- Environment consistency validation
+
+## Service Configuration
+
+### Jenkins (Port 8080)
+- CI/CD pipeline orchestration
+- SCM integration and build triggers
+- Plugin ecosystem for extended functionality
+- Blue Ocean for visual pipeline management
+
+### SonarQube (Port 9000)
+- Code quality analysis
+- Security vulnerability detection
+- Technical debt tracking
+- Quality gate enforcement
+
+### Grafana (Port 3000)
+- Monitoring dashboards
+- Prometheus data visualization
+- Custom metric displays
+- Alert management
+
+### OWASP ZAP (Port 8090)
+- Security vulnerability scanning
+- Automated penetration testing
+- Security report generation
+- Integration with CI/CD pipeline
+
+## Getting Started
+
+### Prerequisites
+- Docker and Docker Compose
+- Git for repository management
+- Virtual Machine for production deployment
+- Ansible for configuration management
+
+### Quick Start
+```bash
+# Clone the repository
+git clone <repository-url>
+cd spring-petclinic
+
+# Start the DevOps environment
+cd devops
+docker-compose up -d
+
+# Verify services are running
+docker-compose ps
+```
+
+### Service Access
+- Jenkins: http://localhost:8080
+- SonarQube: http://localhost:9000
+- Grafana: http://localhost:3000
+- OWASP ZAP: http://localhost:8090
+
+## Project Deliverables
+
+### 📋 Documentation (30 points)
+- Comprehensive setup instructions
+- Step-by-step configuration guides
+- Troubleshooting documentation
+
+### ⚙️ Configuration Files (30 points)
+- Docker Compose configurations
+- Jenkinsfile and pipeline scripts
+- Ansible playbooks
+- Service configuration files
+
+### 📸 Screenshots (20 points)
+- Service dashboards and interfaces
+- Pipeline execution evidence
+- Deployment verification
+- Before/after code change comparisons
+
+### 🎥 Demo Video (20 points)
+- End-to-end pipeline demonstration
+- Automated deployment showcase
+- Monitoring and alerting features
+
+### 🏆 Bonus Features (15 points)
+- Advanced automation scripting
+- One-command deployment
+- Enhanced monitoring capabilities
+
+## Technology Stack
+
+- **Containerization**: Docker, Docker Compose
+- **CI/CD**: Jenkins, Blue Ocean Plugin
+- **Code Quality**: SonarQube
+- **Security**: OWASP ZAP
+- **Monitoring**: Prometheus, Grafana
+- **Configuration Management**: Ansible
+- **Source Control**: Git/GitHub
+- **Application**: Spring Boot (PetClinic)
+
+## Security Considerations
+
+- Network isolation using custom Docker networks
+- Secure service-to-service communication
+- Automated security scanning in CI/CD pipeline
+- Configuration management best practices
+- Secret management and environment separation
+
+## Monitoring Strategy
+
+- **Application Metrics**: Performance, availability, errors
+- **Infrastructure Metrics**: Resource utilization, container health
+- **Pipeline Metrics**: Build success rates, deployment frequency
+- **Security Metrics**: Vulnerability trends, scan results
+
+## Future Enhancements
+
+- Container orchestration with Kubernetes
+- Advanced security scanning tools
+- Multi-environment deployment strategies
+- Enhanced monitoring and alerting
+- Performance optimization strategies
+
+---
+
+**Project Deadline**: July 31, 2025  
+**Course**: 17-636 DevOps  
+**Institution**: Carnegie Mellon University
+
+# Text Dump Containing The Following
 
 * Implementation Steps For:
     * Jenkins Base Setup
@@ -17,9 +220,6 @@ DevSecOps 17636 Summer 2025
     * Owasp Zap
 * References to screenshots of steps
 ___
-
-```
-```
 
 
 ## Jenkins Base Setup
@@ -41,7 +241,7 @@ services:
 ```
 screenshots/Screenshot 2025-07-30 at 8.46.12 PM.png
 
-* Create and configure Jenkins Pipeline (Am using the freestyle template and not the pipeline template as freestyle is catching changes) to be listening for changes in  spring-petclinic forked repo
+* Create and configure Jenkins Pipeline (We are utilizing the freestyle template and not the pipeline template as freestyle is catching changes) to be listening for changes in  spring-petclinic forked repo
 
 screenshots/Screenshot 2025-07-31 at 9.09.47 AM.png
 
@@ -55,11 +255,11 @@ docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 
 screenshots/Screenshot 2025-07-31 at 9.11.50 AM.png
 
-* Made change on the pet clinic home page
+* Make change on the pet clinic home page
 
 screenshots/Screenshot 2025-07-31 at 9.13.07 AM.png
 
-* Pushed changes to main to test jenkins auto polling feature
+* Push changes to main to test jenkins auto polling feature
 
 ```
 spring-petclinic on ! main [+] is & v3.5.0 via
@@ -98,11 +298,11 @@ screenshots/Screenshot 2025-07-31 at 9.15.58 AM.png
 
 ## Installed UTM VM
 
-* Installed UTM VM for Macbook as it supports Apple Silicon (M3)
+* Install UTM VM for Macbook as it supports Apple Silicon (M3)
 
 screenshots/Screenshot 2025-07-31 at 9.17.32 AM.png
 
-* Created VM with Ubuntu 22.0  Server (ARM 64)
+* Create VM with Ubuntu 22.0  Server (ARM 64)
 
 screenshots/Screenshot 2025-07-31 at 9.18.48 AM.png
 
@@ -110,18 +310,18 @@ screenshots/Screenshot 2025-07-31 at 9.19.29 AM.png
 
 screenshots/Screenshot 2025-07-31 at 9.20.11 AM.png
 
-* Started the VM
+* Start the VM
 
 screenshots/Screenshot 2025-07-31 at 9.21.10 AM.png
 
-* Enabled OpenSSH in VM
+* Enable OpenSSH in VM
 
 ```
 sudo systemctl status ssh
 ```
 screenshots/Screenshot 2025-07-31 at 9.22.29 AM.png
 
-* SSH’d to Devops VM on Host Machine - Host can now securely connect to Devops VM
+* SSH to Devops VM on Host Machine - Host can now securely connect to Devops VM
 
 ```
 ssh devops-admin@192.168.64.2
@@ -139,49 +339,48 @@ screenshots/Screenshot 2025-07-31 at 9.26.15 AM.png
 ## Ansible Setup
 
 
-* First entered Jenkins container terminal via the following command
+* First enter Jenkins container terminal via the following command
 ```
 docker exec -u 0 -it jenkins /bin/bash
 ```
 screenshots/Screenshot 2025-07-31 at 9.28.17 AM.png
 
-* Then installed ansible so that the Jenkins container could run the ansible playbook commands.
+* Then install ansible so that the Jenkins container can run the ansible playbook commands.
 
 ```
 apt update && apt install -y iputils-ping
 ```
 screenshots/Screenshot 2025-07-31 at 9.29.29 AM.png
 
-* Created SSH Keys for Jenkins so that the VM won't need to enter a password every time.
+* Create SSH Keys for Jenkins so that the VM won't need to enter a password every time.
 
 ```
 ssh-keygen -t rsa -b 4096 -f /var/jenkins_home/.ssh/id_rsa -N"'
 ```
 screenshots/Screenshot 2025-07-31 at 9.30.47 AM.png
 
-root@c13ef980a06d:/# chmod 700 /var/jenkins_home/.ssh root@c13ef980a06d:/# touch /var/jenkins_home/.ssh/known_hosts root@c13ef980a06d:/# chmod 644 /var/jenkins_home/.ssh/known_hosts root@c13ef980a06d:/# chown -R jenkins:jenkins /var/jenkins_home/.ssh
-
 ```
-chmod 700 /var/jenkins_home/.ssh root@c13ef980a06d:/# touch /var/jenkins_home/.ssh/known_hosts 
+chmod 700 /var/jenkins_home/.ssh 
+touch /var/jenkins_home/.ssh/known_hosts 
 chmod 644 /var/jenkins_home/.ssh/known_hosts 
 chown -R jenkins:jenkins /var/jenkins_home/.ssh
 ```
 screenshots/Screenshot 2025-07-31 at 9.31.54 AM.png
 
-* Checked to make sure the key was generated via the following command
+* Check to make sure the key was generated via the following command
 
 ```
 cat /var/jenkins_home/.ssh/i d_rsa.pub
 ```
 screenshots/Screenshot 2025-07-31 at 9.40.39 AM.png
 
-* Then I SSH’d into the devops VM environment
+* SSH into the devops VM environment
 ```
 ssh devops-admin@192.168.64.2
 ```
 screenshots/Screenshot 2025-07-31 at 9.41.53 AM.png
 
-* Then added the public key and set the file permissions to the Devops VM
+* Then add the public key and set the file permissions to the Devops VM
 
 
 ```
@@ -198,7 +397,7 @@ docker exec -it jenkins ssh devops-admin@192.168.64.2
 ```
 screenshots/Screenshot 2025-07-31 at 9.44.51 AM.png
 
-* Created an Ansible directory within the Spring-Petclinic directory and created a deploy.yml and inventory file
+* Creat an Ansible directory within the Spring-Petclinic directory and creat a deploy.yml and inventory file
 
 screenshots/Screenshot 2025-07-31 at 10.04.07 AM.png
 
@@ -210,11 +409,11 @@ screenshots/Screenshot 2025-07-31 at 10.04.26 AM.png
 
 screenshots/Screenshot 2025-07-31 at 10.04.35 AM.png
 
-* Committed these and pushed to main and checked to see if Jenkins was able to capture the new changes
+* Commit these and push to main and check to see if Jenkins was able to capture the new changes
 
 screenshots/Screenshot 2025-07-31 at 10.05.29 AM.png
 
-* In the Jenkins container I ran the ansible playbook. Jenkins can now remotely control the Devops VM
+* In the Jenkins container run the ansible playbook. Jenkins can now remotely control the Devops VM
 
 ```
 /var/jenkins_home/workspace/dev ops-petclinic-pipeline/ansible# ansible-playbook
@@ -226,15 +425,15 @@ screenshots/Screenshot 2025-07-31 at 10.06.33 AM.png
 
 screenshots/Screenshot 2025-07-31 at 10.07.48 AM.png
 
-* Then made a simple change to test if ansible ran on Jenkins
+* Then make a simple change to test if ansible ran on Jenkins
 
 screenshots/Screenshot 2025-07-31 at 10.08.28 AM.png
 
-* I checked the Jenkins Logs to make sure it ran successfully. It did.
+* Check the Jenkins Logs to make sure it runs successfully (in this case it did - see screenshot)
 
 screenshots/Screenshot 2025-07-31 at 10.09.38 AM.png
 
-* Now to check to make sure that code is deployed correctly, I changed the homepage picture again and made sure it ran on the Devops Server’s Address. The image was successfully changed and reflected via the Devops Server Address.
+* Now to check to make sure that code is deployed correctly, change the homepage picture again and made sure it runs on the Devops Server’s Address. The image was successfully changed and reflected via the Devops Server Address.
 
 ```
 http://192.168.64.2:8080/
@@ -245,7 +444,7 @@ screenshots/Screenshot 2025-07-31 at 10.10.58 AM.png
 
 ## SonarQube Setup
 
-* Added SonarQube to the docker-compose.yml file and created a shared network called devops-petclinic-network so that the two containers can communicate.
+* Add SonarQube to the docker-compose.yml file and create a shared network called devops-petclinic-network so that the two containers can communicate.
 
 ```
 docker-compose.yml
@@ -287,11 +486,11 @@ services:
 
 screenshots/Screenshot 2025-07-31 at 10.13.42 AM.png
 
-* Re-ran docker-compose to make sure it was visible in the docker container
+* Re-run docker-compose to make sure it is visible in the docker container
 
 screenshots/Screenshot 2025-07-31 at 10.17.20 AM.png
 
-* Created Auth Token for Jenkins
+* Create Auth Token for Jenkins
 
 screenshots/Screenshot 2025-07-31 at 10.17.40 AM.png
 
@@ -307,19 +506,19 @@ Sonarqube-auth-token
 <AskForAuthenticationToken>
 ```
 
-* Added sonarqube-auth-token credentials to Jenkins
+* Add sonarqube-auth-token credentials to Jenkins
 
 screenshots/Screenshot 2025-07-31 at 10.19.40 AM.png
 
-* Installed the SonarQube Scanner Plugin
+* Install the SonarQube Scanner Plugin
 
 screenshots/Screenshot 2025-07-31 at 10.20.03 AM.png
 
-* Added SonarQube configurations on Jenkins
+* Add SonarQube configurations on Jenkins
 
 screenshots/Screenshot 2025-07-31 at 10.20.23 AM.png
 
-* Added SonarQube Scanner tool to the Jenkins Global Tools
+* Add SonarQube Scanner tool to the Jenkins Global Tools
 
 screenshots/Screenshot 2025-07-31 at 10.20.38 AM.png
 
@@ -327,22 +526,22 @@ screenshots/Screenshot 2025-07-31 at 10.20.38 AM.png
 
 screenshots/Screenshot 2025-07-31 at 10.21.00 AM.png
 
-* Made a quick change to the spring pet clinic to trigger the jenkins pipeline and see if sonarqube ran successfully.
+* Make a quick change to the spring pet clinic to trigger the jenkins pipeline and see if sonarqube runs successfully.
 
 screenshots/Screenshot 2025-07-31 at 10.21.21 AM.png
 
-* Checked the SonarQube Dashboard to make sure it passed
+* Check the SonarQube Dashboard to make sure it passed (in this case it passed! - see screenshot)
 
 screenshots/Screenshot 2025-07-31 at 10.21.42 AM.png
 
-* Finally, checked the Logs and SonarQube ran successfully and is now fully integrated into the Jenkins pipeline
+* Finally, check the Logs and SonarQube runs successfully and is now fully integrated into the Jenkins pipeline
 
 screenshots/Screenshot 2025-07-31 at 10.22.19 AM.png
 
 
 ## Prometheus Setup
 
-* Added Prometheus to docker-compose.yml file
+* Add Prometheus to docker-compose.yml file
 
 ```
 docker-compose.yml 
@@ -386,7 +585,7 @@ services:
 ```
 screenshots/Screenshot 2025-07-31 at 10.24.46 AM.png
 
-* Created a prometheus.yml file with configurations
+* Create a prometheus.yml file with configurations
 
 ```
 prometheus › ! prometheus.yml
@@ -405,7 +604,7 @@ scrape_configs:
 
 screenshots/Screenshot 2025-07-31 at 10.28.45 AM.png
 
-* Restarted docker to make sure prometheus was visible
+* Restart docker to make sure prometheus was visible
 
 ```
 docker-compose up -d
@@ -423,7 +622,7 @@ screenshots/Screenshot 2025-07-31 at 11.09.18 AM.png
 ```
 screenshots/Screenshot 2025-07-31 at 11.10.49 AM.png
 
-* Added prometheus configuration to application.properties file in spring-petclinic to expose metrics endpoints for scraping
+* Add prometheus configuration to application.properties file in spring-petclinic to expose metrics endpoints for scraping
 
 
 ```
@@ -464,19 +663,19 @@ management.metrics.export.prometheus.enabled=true
 
 screenshots/Screenshot 2025-07-31 at 11.13.39 AM.png
 
-* Pushed changes to repo
+* Push changes to repo
 
 screenshots/Screenshot 2025-07-31 at 11.16.41 AM.png
 
-* Checked Jenkins Logs to make sure pipeline ran successfully
+* Check Jenkins Logs to make sure pipeline runs successfully
 
 screenshots/Screenshot 2025-07-31 at 11.16.49 AM.png
 
-* Checked Prometheus Dashboard. Prometheus now tracking metrics for Spring Pet clinic
+* Check Prometheus Dashboard. Prometheus now tracking metrics for Spring Pet clinic
 
 screenshots/Screenshot 2025-07-31 at 11.17.06 AM.png
 
-* Added job to track metrics from Jenkins
+* Add job to track metrics from Jenkins
 
 ```
 prometheus > !prometheus.yml
@@ -507,7 +706,7 @@ screenshots/Screenshot 2025-07-31 at 11.20.15 AM.png
 
 ## Grafana Setup
 
-* Added grafana to docker-compose.yml file
+* Add grafana to docker-compose.yml file
 
 ```
 docker-compose.yml 
@@ -538,7 +737,7 @@ networks:
 ```
 screenshots/Screenshot 2025-07-31 at 11.21.31 AM.png
 
-* Re-ran docker to make sure it got added to the devops docker container
+* Re-run docker to make sure it got added to the devops docker container
 
 screenshots/Screenshot 2025-07-31 at 11.25.27 AM.png
 
@@ -546,15 +745,15 @@ screenshots/Screenshot 2025-07-31 at 11.25.27 AM.png
 
 admin/admin
 
-* Added prometheus as a data source within the grafana dashboard
+* Add prometheus as a data source within the grafana dashboard
 
 screenshots/Screenshot 2025-07-31 at 11.29.31 AM.png
 
-* Added basic queries to track spring-petclinic metrics
+* Add basic queries to track spring-petclinic metrics
 
 screenshots/Screenshot 2025-07-31 at 11.29.46 AM.png
 
-* Added base queries to track Jenkin Build metrics.
+* Add base queries to track Jenkin Build metrics.
 
 screenshots/Screenshot 2025-07-31 at 11.29.55 AM.png
 
@@ -562,7 +761,7 @@ screenshots/Screenshot 2025-07-31 at 11.29.55 AM.png
 
 screenshots/Screenshot 2025-07-31 at 11.30.04 AM.png
 
-* Made change to trigger pipeline and see if grafana dashboard captured new metrics
+* Make change to trigger pipeline and see if grafana dashboard captured new metrics
 
 screenshots/Screenshot 2025-07-31 at 11.30.12 AM.png
 
@@ -573,7 +772,7 @@ screenshots/Screenshot 2025-07-31 at 11.30.21 AM.png
 ## Owasp Zap
 
 
-* Added owasp zap to the docker-compose file
+* Add owasp zap to the docker-compose file
 
 
 ```
@@ -618,7 +817,7 @@ networks:
 ```
 screenshots/Screenshot 2025-07-31 at 11.34.19 AM.png
 
-* Re-ran docker to make sure it got pulled successfully
+* Re-run docker to make sure it got pulled successfully
 
 screenshots/Screenshot 2025-07-31 at 11.34.55 AM.png
 
@@ -630,7 +829,7 @@ screenshots/Screenshot 2025-07-31 at 11.35.04 AM.png
 
 screenshots/Screenshot 2025-07-31 at 11.35.12 AM.png
 
-* Finally added post build action to generate the new zap html report
+* Finally, add post build action to generate the new zap html report
 
 screenshots/Screenshot 2025-07-31 at 11.35.20 AM.png
 
